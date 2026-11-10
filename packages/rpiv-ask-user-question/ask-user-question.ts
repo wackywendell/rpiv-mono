@@ -308,6 +308,11 @@ async function mountQuestionnaire(config: {
 	// may emit `setHidden` only when it was actually registered; otherwise collapse falls
 	// back to the visible one-line row.
 	const canReopenWhileHidden = removeOverlayInputListener !== undefined;
+	// Older hosts ignore the metadata; Pi 1.5+ reports the inline dialog through OSC 7501.
+	const inlineOptions = {
+		overlay: false,
+		blocked: { kind: "question" as const, message: "Question awaiting answer" },
+	};
 	try {
 		return await ctx.ui.custom<QuestionnaireResult>(
 			makeSessionFactory({ ...config, canReopenWhileHidden, sessionRef }),
@@ -325,7 +330,7 @@ async function mountQuestionnaire(config: {
 							sessionRef.current?.setOverlayHandle(handle);
 						},
 					}
-				: { overlay: false },
+				: inlineOptions,
 		);
 	} finally {
 		removeOverlayInputListener?.();

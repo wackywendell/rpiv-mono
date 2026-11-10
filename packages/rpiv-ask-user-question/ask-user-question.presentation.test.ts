@@ -100,13 +100,19 @@ describe("inline presentation", () => {
 		writeConfig(config);
 		const { run, ctx, onTerminalInput } = setup(async () => ({ answers: [], cancelled: true }));
 		await run(twoOptions);
-		expect(vi.mocked(ctx.ui.custom).mock.calls[0]?.[1]).toEqual({ overlay: false });
+		expect(vi.mocked(ctx.ui.custom).mock.calls[0]?.[1]).toEqual({
+			overlay: false,
+			blocked: { kind: "question", message: "Question awaiting answer" },
+		});
 		expect(onTerminalInput).not.toHaveBeenCalled();
 	});
 
 	it("collapses to a visible row without a raw listener, and still submits", async () => {
 		const { run, ctx, onTerminalInput } = setup(async (factory, options) => {
-			expect(options).toEqual({ overlay: false });
+			expect(options).toEqual({
+				overlay: false,
+				blocked: { kind: "question", message: "Question awaiting answer" },
+			});
 			let result: QuestionnaireResult | undefined;
 			const component = mount(factory, 24, (answer) => {
 				result = answer;
